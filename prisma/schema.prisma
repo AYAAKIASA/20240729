@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String
+  password      String
+  role          Role           @default(APPLICANT)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  posts         Post[]
+  resumes       Resume[]
+  logs          ResumeLog[]
+  refreshTokens RefreshToken[]
+}
+
+enum Role {
+  APPLICANT
+  RECRUITER
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Resume {
+  id           Int         @id @default(autoincrement())
+  title        String
+  introduction String
+  status       Status
+  userId       Int
+  user         User        @relation(fields: [userId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  logs         ResumeLog[]
+}
+
+enum Status {
+  APPLY
+  DROP
+  PASS
+  INTERVIEW1
+  INTERVIEW2
+  FINAL_PASS
+}
+
+model ResumeLog {
+  id          Int      @id @default(autoincrement())
+  resumeId    Int
+  recruiterId Int
+  oldStatus   Status
+  newStatus   Status
+  reason      String
+  createdAt   DateTime @default(now())
+  resume      Resume   @relation(fields: [resumeId], references: [id])
+  recruiter   User     @relation(fields: [recruiterId], references: [id])
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
