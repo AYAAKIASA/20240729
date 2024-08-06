@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../utils/prisma.util');
+
 const router = express.Router();
 const saltRounds = 10;
 
@@ -116,7 +117,10 @@ router.post('/refresh-token', async (req, res) => {
 
     await prisma.refreshToken.update({
       where: { token: refreshToken },
-      data: { token: newRefreshToken, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) }
+      data: {
+        token: newRefreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
     });
 
     res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken });

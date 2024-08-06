@@ -159,7 +159,7 @@ router.delete('/:resumeId', requireAccessToken, async (req, res) => {
 router.patch('/:resumeId/status', requireAccessToken, requireRoles(['RECRUITER']), async (req, res) => {
   const { resumeId } = req.params;
   const { status, reason } = req.body;
-  const { user } = req; 
+  const { user } = req;
 
   if (!status) {
     return res.status(400).json({ message: '변경하고자 하는 지원 상태를 입력해 주세요.' });
@@ -210,7 +210,6 @@ router.patch('/:resumeId/status', requireAccessToken, requireRoles(['RECRUITER']
       reason,
     });
   } catch (error) {
-    console.error(error); 
     res.status(500).json({ message: '이력서 상태 변경에 실패했습니다.' });
   }
 });
