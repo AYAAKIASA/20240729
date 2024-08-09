@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../utils/prisma.util');
-const requireAccessToken = require('../middlewares/require-access-token.middleware');  // 이 줄을 추가
+const requireAccessToken = require('../middlewares/require-access-token.middleware');
 
 const router = express.Router();
 const saltRounds = 10;
