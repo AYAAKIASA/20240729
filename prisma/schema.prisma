@@ -19,6 +19,7 @@ model User {
   resumes       Resume[]
   logs          ResumeLog[]
   refreshTokens RefreshToken[]
+  accessTokens  AccessToken[]
 }
 
 enum Role {
@@ -66,11 +67,20 @@ model ResumeLog {
   newStatus   Status
   reason      String
   createdAt   DateTime @default(now())
-  resume      Resume   @relation(fields: [resumeId], references: [id])
-  recruiter   User     @relation(fields: [recruiterId], references: [id])
+  resume      Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  recruiter   User     @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model AccessToken {
   id        Int      @id @default(autoincrement())
   token     String   @unique
   userId    Int

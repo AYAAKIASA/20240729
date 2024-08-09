@@ -2,11 +2,12 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../utils/prisma.util');
+const requireAccessToken = require('../middlewares/require-access-token.middleware');  // 이 줄을 추가
 
 const router = express.Router();
 const saltRounds = 10;
 
-// 회원가입 API
+// 회원가입
 router.post('/signup', async (req, res) => {
   const { email, password, confirmPassword, name } = req.body;
 
@@ -51,7 +52,7 @@ router.post('/signup', async (req, res) => {
   });
 });
 
-// 로그인 시 RefreshToken도 발급하고 저장
+// 로그인
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -86,7 +87,7 @@ router.post('/login', async (req, res) => {
   res.status(200).json({ accessToken, refreshToken });
 });
 
-// 토큰 재발급 API
+// 토큰 재발급
 router.post('/refresh-token', async (req, res) => {
   const authHeader = req.headers.authorization;
 
@@ -129,27 +130,35 @@ router.post('/refresh-token', async (req, res) => {
   }
 });
 
-// 로그아웃 API
-router.post('/logout', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(400).json({ message: 'Invalid authentication header' });
-  }
-
-  const refreshToken = authHeader.split(' ')[1];
-  if (!refreshToken) {
-    return res.status(400).json({ message: 'RefreshToken이 필요합니다.' });
-  }
+// 회원탈퇴
+router.delete('/delete-account', requireAccessToken, async (req, res) => {
+  const { user } = req;
 
   try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-    const userId = decoded.userId;
+    await prisma.resumeLog.deleteMany({
+      where: { resume: { userId: user.id } },
+    });
 
-    await prisma.refreshToken.delete({ where: { token: refreshToken } });
+    await prisma.resume.deleteMany({
+      where: { userId: user.id },
+    });
 
-    res.status(200).json({ message: '로그아웃 되었습니다.', userId });
+    await prisma.accessToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await prisma.refreshToken.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await prisma.user.delete({
+      where: { id: user.id },
+    });
+
+    res.status(200).json({ message: '회원탈퇴가 완료되었습니다.' });
   } catch (error) {
-    res.status(401).json({ message: 'RefreshToken 검증 실패' });
+    console.error('회원탈퇴 오류:', error);
+    res.status(500).json({ message: '회원탈퇴 중 오류가 발생했습니다.' });
   }
 });
 

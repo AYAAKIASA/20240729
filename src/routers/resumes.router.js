@@ -4,7 +4,7 @@ const requireRoles = require('../middlewares/require-roles.middleware');
 const { prisma } = require('../utils/prisma.util');
 const router = express.Router();
 
-// 이력서 생성 API
+// 이력서 생성
 router.post('/', requireAccessToken, async (req, res) => {
   const { title, introduction } = req.body;
   const { user } = req;
@@ -29,7 +29,7 @@ router.post('/', requireAccessToken, async (req, res) => {
   }
 });
 
-// 이력서 목록 조회 API
+// 이력서 목록 조회
 router.get('/', requireAccessToken, async (req, res) => {
   const { user } = req;
   const { sort = 'desc' } = req.query;
@@ -63,7 +63,7 @@ router.get('/', requireAccessToken, async (req, res) => {
   }
 });
 
-// 이력서 상세 조회 API
+// 이력서 상세 조회
 router.get('/:resumeId', requireAccessToken, async (req, res) => {
   const { user } = req;
   const { resumeId } = req.params;
@@ -98,7 +98,7 @@ router.get('/:resumeId', requireAccessToken, async (req, res) => {
   }
 });
 
-// 이력서 수정 API
+// 이력서 수정
 router.put('/:resumeId', requireAccessToken, async (req, res) => {
   const { user } = req;
   const { resumeId } = req.params;
@@ -131,7 +131,7 @@ router.put('/:resumeId', requireAccessToken, async (req, res) => {
   }
 });
 
-// 이력서 삭제 API
+// 이력서 삭제
 router.delete('/:resumeId', requireAccessToken, async (req, res) => {
   const { user } = req;
   const { resumeId } = req.params;
@@ -155,7 +155,7 @@ router.delete('/:resumeId', requireAccessToken, async (req, res) => {
   }
 });
 
-// 이력서 상태 변경 API
+// 이력서 상태 변경
 router.patch('/:resumeId/status', requireAccessToken, requireRoles(['RECRUITER']), async (req, res) => {
   const { resumeId } = req.params;
   const { status, reason } = req.body;
@@ -214,7 +214,7 @@ router.patch('/:resumeId/status', requireAccessToken, requireRoles(['RECRUITER']
   }
 });
 
-// 이력서 로그 목록 조회 API
+// 이력서 로그 목록 조회
 router.get('/:resumeId/logs', requireAccessToken, requireRoles(['RECRUITER']), async (req, res) => {
   const { resumeId } = req.params;
 
