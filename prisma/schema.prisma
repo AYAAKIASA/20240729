@@ -15,7 +15,6 @@ model User {
   role          Role           @default(APPLICANT)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  posts         Post[]
   resumes       Resume[]
   logs          ResumeLog[]
   refreshTokens RefreshToken[]
@@ -25,17 +24,6 @@ model User {
 enum Role {
   APPLICANT
   RECRUITER
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Resume {
